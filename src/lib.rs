@@ -61,8 +61,8 @@ where
     /// Clears the file. Panics on failure
     fn clear_file(&mut self) {
         use std::io::{Seek, SeekFrom};
-        self.file.set_len(0).expect("");
-        self.file.seek(SeekFrom::Start(0)).unwrap();
+        self.file.set_len(0).expect("Failed to set length of file to 0");
+        self.file.seek(SeekFrom::Start(0)).expect("Failed to seek to beginning of file");
     }
 
     /// Sets the value of `self`
