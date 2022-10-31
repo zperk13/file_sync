@@ -61,8 +61,12 @@ where
     /// Clears the file. Panics on failure
     fn clear_file(&mut self) {
         use std::io::{Seek, SeekFrom};
-        self.file.set_len(0).expect("Failed to set length of file to 0");
-        self.file.seek(SeekFrom::Start(0)).expect("Failed to seek to beginning of file");
+        self.file
+            .set_len(0)
+            .expect("Failed to set length of file to 0");
+        self.file
+            .seek(SeekFrom::Start(0))
+            .expect("Failed to seek to beginning of file");
     }
 
     /// Sets the value of `self`
@@ -82,6 +86,10 @@ where
     }
 
     /// Modifies data and syncs the modified data to the file given a `Fn(&mut T)`
+    ///
+    /// Panics if it fails to clear the file
+    ///
+    /// Returns an error if serde_json::to_writer returns an error
     pub fn modify<F>(&mut self, f: F) -> Result<(), FileSyncError>
     where
         F: Fn(&mut T),
