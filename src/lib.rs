@@ -1,5 +1,6 @@
 /// Note: Methods that take a `&mut self` and return a `Result` might cause de-sync between the internal data and the file if the `Result` is an `Err`
-use serde::{de::DeserializeOwned, Serialize};
+use serde::de::DeserializeOwned;
+pub use serde::{self, Deserialize, Serialize};
 use std::fs::File;
 pub use std::path::Path;
 
