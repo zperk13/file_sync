@@ -98,7 +98,7 @@ where
     /// Returns an error if `self.write` returns an error
     pub fn modify<F>(&mut self, f: F) -> Result<(), FileSyncError>
     where
-        F: Fn(&mut T),
+        F: FnOnce(&mut T),
     {
         (f)(&mut self.data);
         self.clear_file();
