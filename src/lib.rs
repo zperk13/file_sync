@@ -35,7 +35,6 @@ where
     /// Will return an error if the creating the `File` returns an error
     ///
     /// Will return an error if `self.write` returns an error
-
     pub fn new(fp: &Path, data: T, pretty: bool) -> Result<Self, FileSyncError> {
         if fp.exists() {
             Err(FileSyncError::FileAlreadyExists { fp })
@@ -62,6 +61,23 @@ where
         let file = File::options().read(true).write(true).open(fp)?;
         let data = serde_json::from_reader(&file)?;
         Ok(Self { data, file, pretty })
+    }
+
+    /// Creates a new `FileSync` type loading and syncing data from an already existing file, or creating a new one if the file doesn't exist
+    ///
+    /// `pretty` determines if iet will use serde_json::to_writer_pretty instead of `serde_json::to_writer`
+    ///
+    /// Will return an error if the creating the `File` returns an error
+    ///
+    /// Will return an error if `self.write` returns an error
+    ///
+    /// Will return an error if `serde_json::from_reader` returns an error
+    pub fn load_or_new(fp: &Path, data: T, pretty: bool) -> Result<Self, FileSyncError> {
+        if fp.exists() {
+            FileSync::load(fp, pretty)
+        } else {
+            FileSync::new(fp, data, pretty)
+        }
     }
 
     /// Clears the file. Panics on failure
