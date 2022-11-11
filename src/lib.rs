@@ -3,6 +3,7 @@ use serde::{de::DeserializeOwned, Serialize};
 use std::fs::File;
 pub use std::path::Path;
 
+#[derive(Debug)]
 pub struct FileSync<T>
 where
     T: Serialize + DeserializeOwned,
