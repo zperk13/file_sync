@@ -1,6 +1,6 @@
 [package]
 name = "file_sync"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/zperk13/file_sync"
@@ -9,5 +9,5 @@ repository = "https://github.com/zperk13/file_sync"
 
 [dependencies]
 serde = "1.0.147"
-serde_json = "1.0.87"
+serde_json = "1.0.88"
 thiserror = "1.0.37"
