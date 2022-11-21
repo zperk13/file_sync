@@ -133,3 +133,13 @@ where
         Ok(())
     }
 }
+
+impl<T> std::ops::Deref for FileSync<T>
+where
+    T: Serialize + DeserializeOwned,
+{
+    type Target = T;
+    fn deref(&self) -> &T {
+        self.get()
+    }
+}
