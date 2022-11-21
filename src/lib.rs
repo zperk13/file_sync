@@ -1,6 +1,7 @@
-/// Note: Methods that take a `&mut self` and return a `Result` might cause de-sync between the internal data and the file if the `Result` is an `Err`
+//! Note: Methods that take a `&mut self` and return a `Result` might cause de-sync between the internal data and the file if the `Result` is an `Err`
 use serde::{de::DeserializeOwned, Serialize};
 use std::fs::File;
+#[doc(no_inline)]
 pub use std::path::Path;
 
 #[derive(Debug)]
@@ -10,6 +11,7 @@ where
 {
     data: T,
     file: File,
+    /// Specifies if when writing to the file if [`serde_json::to_writer_pretty`] will be used instead of [`serde_json::to_writer`]
     pub pretty: bool,
 }
 
@@ -29,11 +31,13 @@ where
 {
     /// Creates a new `FileSync` type syncing a file with the path `fp` and `data`
     ///
-    /// `pretty` determines if iet will use serde_json::to_writer_pretty instead of `serde_json::to_writer`
+    /// `pretty` determines if it will use [`serde_json::to_writer_pretty`] instead of [`serde_json::to_writer`]
+    ///
+    /// # Errors
     ///
     /// Will return an error if a file at that path already exists
     ///
-    /// Will return an error if the creating the `File` returns an error
+    /// Will return an error if the creating the [`File`] returns an error
     ///
     /// Will return an error if `Self::write` returns an error
     pub fn new(fp: &Path, data: T, pretty: bool) -> Result<Self, FileSyncError> {
@@ -53,11 +57,13 @@ where
 
     /// Creates a new `FileSync` type loading and syncing data from an already existing file
     ///
-    /// `pretty` determines if iet will use serde_json::to_writer_pretty instead of `serde_json::to_writer`
+    /// `pretty` determines if iet will use [`serde_json::to_writer_pretty`] instead of [`serde_json::to_writer`]
     ///
-    /// Will return an error if the creating the `File` returns an error
+    /// # Errors
     ///
-    /// Will return an error if `serde_json::from_reader` returns an error
+    /// Will return an error if the creating the [`File`] returns an error
+    ///
+    /// Will return an error if [`serde_json::from_reader`] returns an error
     pub fn load(fp: &Path, pretty: bool) -> Result<Self, FileSyncError> {
         let file = File::options().read(true).write(true).open(fp)?;
         let data = serde_json::from_reader(&file)?;
@@ -66,13 +72,15 @@ where
 
     /// Creates a new `FileSync` type loading and syncing data from an already existing file, or creating a new one if the file doesn't exist
     ///
-    /// `pretty` determines if iet will use serde_json::to_writer_pretty instead of `serde_json::to_writer`
+    /// `pretty` determines if iet will use serde_json::to_writer_pretty instead of [`serde_json::to_writer`]
     ///
-    /// Will return an error if the creating the `File` returns an error
+    /// # Errors
+    ///
+    /// Will return an error if the creating the [`File`] returns an error
     ///
     /// Will return an error if `Self::write` returns an error
     ///
-    /// Will return an error if `serde_json::from_reader` returns an error
+    /// Will return an error if [`serde_json::from_reader`] returns an error
     pub fn load_or_new(fp: &Path, data: T, pretty: bool) -> Result<Self, FileSyncError> {
         if fp.exists() {
             FileSync::load(fp, pretty)
@@ -94,9 +102,11 @@ where
 
     /// Sets the value of `self`
     ///
+    /// # Errors
+    ///
     /// Panics if it fails to clear the file
     ///
-    /// Returns an error if `serde_json::to_writer`/`serde_json::to_writer_pretty` returns an error
+    /// Returns an error if [`serde_json::to_writer`]/[`serde_json::to_writer_pretty`] returns an error
     pub fn set(&mut self, data: T) -> Result<(), FileSyncError> {
         self.clear_file();
         Self::write(&self.file, &self.data, self.pretty)?;
@@ -104,11 +114,14 @@ where
         Ok(())
     }
 
+    /// Returns an immutable reference to the stored data
     pub fn get(&self) -> &T {
         &self.data
     }
 
     /// Modifies data and syncs the modified data to the file given a `Fn(&mut T)`
+    ///
+    /// # Errors
     ///
     /// Panics if it fails to clear the file
     ///
@@ -123,7 +136,9 @@ where
         Ok(())
     }
 
-    /// Will return an error if `serde_json::to_writer`/`serde_json::to_writer_pretty` fails
+    /// # Errors
+    ///
+    /// Will return an error if [`serde_json::to_writer`]/[`serde_json::to_writer_pretty`] fails
     fn write(file: &File, value: &T, pretty: bool) -> Result<(), serde_json::Error> {
         if pretty {
             serde_json::to_writer_pretty(file, value)?;
