@@ -143,3 +143,12 @@ where
         self.get()
     }
 }
+
+impl<T> std::convert::AsRef<T> for FileSync<T>
+where
+    T: Serialize + DeserializeOwned,
+{
+    fn as_ref(&self) -> &T {
+        self.get()
+    }
+}
