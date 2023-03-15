@@ -4,7 +4,7 @@ use std::fs::File;
 #[doc(no_inline)]
 pub use std::path::Path;
 
-// Note: Methods that take a `&mut self` and return a [`Result`] might cause de-sync between the internal data and the file if the [`Result`] is an [`Err`]
+/// Note: Methods that take a `&mut self` and return a [`Result`] might cause de-sync between the internal data and the file if the [`Result`] is an [`Err`]
 #[derive(Debug)]
 pub struct FileSync<T>
 where
