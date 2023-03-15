@@ -4,6 +4,7 @@ use std::fs::File;
 #[doc(no_inline)]
 pub use std::path::Path;
 
+// Note: Methods that take a `&mut self` and return a [`Result`] might cause de-sync between the internal data and the file if the [`Result`] is an [`Err`]
 #[derive(Debug)]
 pub struct FileSync<T>
 where
@@ -100,7 +101,7 @@ where
             .expect("Failed to seek to beginning of file");
     }
 
-    /// Sets the value of `self`
+    /// Sets the value of the stored data
     ///
     /// # Panics
     ///
