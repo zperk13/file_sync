@@ -167,6 +167,10 @@
 <a href="#167" id="167">167</a>
 <a href="#168" id="168">168</a>
 <a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Note: Methods that take a `&amp;mut self` and return a [`Result`] might cause de-sync between the internal data and the file if the [`Result`] is an [`Err`]
 </span><span class="kw">use </span>serde::{de::DeserializeOwned, Serialize};
 <span class="kw">use </span>std::fs::File;
@@ -208,7 +212,7 @@
     ///
     /// Will return an error if the creating the [`File`] returns an error
     ///
-    /// Will return an error if `Self::write` returns an error
+    /// Will return an error if [`serde_json::to_writer`]/[`serde_json::to_writer_pretty`] returns an error
     </span><span class="kw">pub fn </span>new(fp: <span class="kw-2">&amp;</span>Path, data: T, pretty: bool) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, FileSyncError&gt; {
         <span class="kw">if </span>fp.exists() {
             <span class="prelude-val">Err</span>(FileSyncError::FileAlreadyExists { fp })
@@ -247,7 +251,7 @@
     ///
     /// Will return an error if the creating the [`File`] returns an error
     ///
-    /// Will return an error if `Self::write` returns an error
+    /// Will return an error if [`serde_json::to_writer`]/[`serde_json::to_writer_pretty`] returns an error
     ///
     /// Will return an error if [`serde_json::from_reader`] returns an error
     </span><span class="kw">pub fn </span>load_or_new(fp: <span class="kw-2">&amp;</span>Path, data: T, pretty: bool) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, FileSyncError&gt; {
@@ -271,9 +275,11 @@
 
     <span class="doccomment">/// Sets the value of `self`
     ///
-    /// # Errors
+    /// # Panics
     ///
     /// Panics if it fails to clear the file
+    ///
+    /// # Errors
     ///
     /// Returns an error if [`serde_json::to_writer`]/[`serde_json::to_writer_pretty`] returns an error
     </span><span class="kw">pub fn </span>set(<span class="kw-2">&amp;mut </span><span class="self">self</span>, data: T) -&gt; <span class="prelude-ty">Result</span>&lt;(), FileSyncError&gt; {
@@ -290,11 +296,13 @@
 
     <span class="doccomment">/// Modifies data and syncs the modified data to the file given a `Fn(&amp;mut T)`
     ///
-    /// # Errors
+    /// # Panics
     ///
     /// Panics if it fails to clear the file
     ///
-    /// Returns an error if `Self::write` returns an error
+    /// # Errors
+    ///
+    /// Returns an error if [`serde_json::to_writer`]/[`serde_json::to_writer_pretty`] returns an error
     </span><span class="kw">pub fn </span>modify&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, f: F) -&gt; <span class="prelude-ty">Result</span>&lt;(), FileSyncError&gt;
     <span class="kw">where
         </span>F: FnOnce(<span class="kw-2">&amp;mut </span>T),
