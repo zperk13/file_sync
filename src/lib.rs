@@ -39,7 +39,7 @@ where
     ///
     /// Will return an error if the creating the [`File`] returns an error
     ///
-    /// Will return an error if `Self::write` returns an error
+    /// Will return an error if [`serde_json::to_writer`]/[`serde_json::to_writer_pretty`] returns an error
     pub fn new(fp: &Path, data: T, pretty: bool) -> Result<Self, FileSyncError> {
         if fp.exists() {
             Err(FileSyncError::FileAlreadyExists { fp })
@@ -78,7 +78,7 @@ where
     ///
     /// Will return an error if the creating the [`File`] returns an error
     ///
-    /// Will return an error if `Self::write` returns an error
+    /// Will return an error if [`serde_json::to_writer`]/[`serde_json::to_writer_pretty`] returns an error
     ///
     /// Will return an error if [`serde_json::from_reader`] returns an error
     pub fn load_or_new(fp: &Path, data: T, pretty: bool) -> Result<Self, FileSyncError> {
@@ -102,9 +102,11 @@ where
 
     /// Sets the value of `self`
     ///
-    /// # Errors
+    /// # Panics
     ///
     /// Panics if it fails to clear the file
+    ///
+    /// # Errors
     ///
     /// Returns an error if [`serde_json::to_writer`]/[`serde_json::to_writer_pretty`] returns an error
     pub fn set(&mut self, data: T) -> Result<(), FileSyncError> {
@@ -121,11 +123,13 @@ where
 
     /// Modifies data and syncs the modified data to the file given a `Fn(&mut T)`
     ///
-    /// # Errors
+    /// # Panics
     ///
     /// Panics if it fails to clear the file
     ///
-    /// Returns an error if `Self::write` returns an error
+    /// # Errors
+    ///
+    /// Returns an error if [`serde_json::to_writer`]/[`serde_json::to_writer_pretty`] returns an error
     pub fn modify<F>(&mut self, f: F) -> Result<(), FileSyncError>
     where
         F: FnOnce(&mut T),
