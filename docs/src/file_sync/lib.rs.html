@@ -171,13 +171,15 @@
 <a href="#171" id="171">171</a>
 <a href="#172" id="172">172</a>
 <a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Note: Methods that take a `&amp;mut self` and return a [`Result`] might cause de-sync between the internal data and the file if the [`Result`] is an [`Err`]
 </span><span class="kw">use </span>serde::{de::DeserializeOwned, Serialize};
 <span class="kw">use </span>std::fs::File;
 <span class="attr">#[doc(no_inline)]
 </span><span class="kw">pub use </span>std::path::Path;
 
-<span class="attr">#[derive(Debug)]
+<span class="comment">// Note: Methods that take a `&amp;mut self` and return a [`Result`] might cause de-sync between the internal data and the file if the [`Result`] is an [`Err`]
+</span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>FileSync&lt;T&gt;
 <span class="kw">where
     </span>T: Serialize + DeserializeOwned,
@@ -273,7 +275,7 @@
             .expect(<span class="string">&quot;Failed to seek to beginning of file&quot;</span>);
     }
 
-    <span class="doccomment">/// Sets the value of `self`
+    <span class="doccomment">/// Sets the value of the stored data
     ///
     /// # Panics
     ///
