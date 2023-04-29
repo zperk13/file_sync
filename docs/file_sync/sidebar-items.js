@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["FileSyncError",""]],"struct":[["FileSync","Note: Methods that take a `&mut self` and return a [`Result`] might cause de-sync between the internal data and the file if the [`Result`] is an [`Err`]"]]};
+window.SIDEBAR_ITEMS = {"enum":["ClearFileError","FileSyncError"],"struct":["FileSync"]};
