@@ -1,4 +1,18 @@
 //! Note: Methods that take a `&mut self` and return a [`Result`] might cause de-sync between the internal data and the file if the [`Result`] is an [`Err`]
+
+#![warn(clippy::cast_possible_truncation)]
+#![warn(clippy::exit)]
+#![cfg_attr(not(test), warn(clippy::expect_used))]
+#![warn(clippy::fallible_impl_from)]
+#![cfg_attr(not(test), warn(clippy::index_refutable_slice))]
+#![cfg_attr(not(test), warn(clippy::indexing_slicing))]
+#![cfg_attr(not(test), warn(clippy::integer_arithmetic))]
+#![cfg_attr(not(test), warn(clippy::missing_panics_doc))]
+#![cfg_attr(not(test), warn(clippy::panic))]
+#![warn(clippy::unchecked_duration_subtraction)]
+#![cfg_attr(not(test), warn(clippy::unreachable))]
+#![cfg_attr(not(test), warn(clippy::unwrap_used))]
+
 use serde::{de::DeserializeOwned, Serialize};
 use std::fs::File;
 #[doc(no_inline)]
@@ -24,6 +38,16 @@ pub enum FileSyncError<'a> {
     IoError(#[from] std::io::Error),
     #[error("serde_json error")]
     SerdeJsonError(#[from] serde_json::Error),
+    #[error("ClearFile error")]
+    ClearFileError(#[from] ClearFileError),
+}
+
+#[derive(thiserror::Error, Debug)]
+pub enum ClearFileError {
+    #[error("Failed to set len of file to 0. Extra info: {0}")]
+    SetLenError(std::io::Error),
+    #[error("Failed to seek to beginning of file. Extra info: {0}")]
+    SeekError(std::io::Error),
 }
 
 impl<T> FileSync<T>
@@ -90,28 +114,28 @@ where
         }
     }
 
-    /// Clears the file. Panics on failure
-    fn clear_file(&mut self) {
+    /// Clears the file.
+    ///
+    /// # Errors
+    ///
+    /// If the function somehow fails to clear the file or seek to the beginning of file, it will return an error
+    fn clear_file(&mut self) -> Result<(), ClearFileError> {
         use std::io::{Seek, SeekFrom};
-        self.file
-            .set_len(0)
-            .expect("Failed to set length of file to 0");
+        self.file.set_len(0).map_err(ClearFileError::SetLenError)?;
         self.file
             .seek(SeekFrom::Start(0))
-            .expect("Failed to seek to beginning of file");
+            .map_err(ClearFileError::SeekError)?;
+        Ok(())
     }
 
     /// Sets the value of the stored data
     ///
-    /// # Panics
-    ///
-    /// Panics if it fails to clear the file
-    ///
     /// # Errors
     ///
     /// Returns an error if [`serde_json::to_writer`]/[`serde_json::to_writer_pretty`] returns an error
+    /// Returns an error if it fails to clear the file
     pub fn set(&mut self, data: T) -> Result<(), FileSyncError> {
-        self.clear_file();
+        self.clear_file()?;
         Self::write(&self.file, &self.data, self.pretty)?;
         self.data = data;
         Ok(())
@@ -124,19 +148,16 @@ where
 
     /// Modifies data and syncs the modified data to the file given a `Fn(&mut T)`
     ///
-    /// # Panics
-    ///
-    /// Panics if it fails to clear the file
-    ///
     /// # Errors
     ///
     /// Returns an error if [`serde_json::to_writer`]/[`serde_json::to_writer_pretty`] returns an error
+    /// Returns an error if it fails to clear the file
     pub fn modify<F>(&mut self, f: F) -> Result<(), FileSyncError>
     where
         F: FnOnce(&mut T),
     {
         (f)(&mut self.data);
-        self.clear_file();
+        self.clear_file()?;
         Self::write(&self.file, &self.data, self.pretty)?;
         Ok(())
     }
