@@ -136,7 +136,7 @@ where
     /// Returns an error if it fails to clear the file
     pub fn set(&mut self, data: T) -> Result<(), FileSyncError> {
         self.clear_file()?;
-        Self::write(&self.file, &self.data, self.pretty)?;
+        Self::write(&self.file, &data, self.pretty)?;
         self.data = data;
         Ok(())
     }
