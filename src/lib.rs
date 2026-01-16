@@ -133,6 +133,7 @@ where
     /// # Errors
     ///
     /// Returns an error if [`serde_json::to_writer`]/[`serde_json::to_writer_pretty`] returns an error
+    ///
     /// Returns an error if it fails to clear the file
     pub fn set(&mut self, data: T) -> Result<(), FileSyncError> {
         self.clear_file()?;
@@ -151,6 +152,7 @@ where
     /// # Errors
     ///
     /// Returns an error if [`serde_json::to_writer`]/[`serde_json::to_writer_pretty`] returns an error
+    ///
     /// Returns an error if it fails to clear the file
     pub fn modify<F>(&mut self, f: F) -> Result<(), FileSyncError>
     where
