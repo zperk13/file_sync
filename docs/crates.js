@@ -1,1 +1,2 @@
-window.ALL_CRATES = ["file_sync","itoa","proc_macro2","quote","ryu","serde","serde_json","syn","thiserror","thiserror_impl","unicode_ident"];
+window.ALL_CRATES = ["file_sync"];
+//{"start":21,"fragment_lengths":[11]}
