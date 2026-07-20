@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="file_sync" data-themes="" data-resource-suffix="" data-rustdoc-version="1.92.0 (ded5c06cf 2025-12-08)" data-channel="1.92.0" data-search-js="search-d69d8955.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-ce535bd0.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">file_sync/</div>lib.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! Note: Methods that take a `&amp;mut self` and return a [`Result`] might cause de-sync between the internal data and the file if the [`Result`] is an [`Err`]
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="file_sync" data-themes="" data-resource-suffix="" data-rustdoc-version="1.97.1 (8bab26f4f 2026-07-14)" data-channel="1.97.1" data-search-js="search-fd9372ac.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../static.files/storage-41dd4d93.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-fcd733ba.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">file_sync/</div>lib.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! Note: Methods that take a `&amp;mut self` and return a [`Result`] might cause de-sync between the internal data and the file if the [`Result`] is an [`Err`]
 <a href=#2 id=2 data-nosnippet>2</a>
 <a href=#3 id=3 data-nosnippet>3</a></span><span class="attr">#![warn(clippy::cast_possible_truncation)]
 <a href=#4 id=4 data-nosnippet>4</a>#![warn(clippy::exit)]
@@ -6,17 +6,17 @@
 <a href=#6 id=6 data-nosnippet>6</a>#![warn(clippy::fallible_impl_from)]
 <a href=#7 id=7 data-nosnippet>7</a>#![cfg_attr(not(test), warn(clippy::index_refutable_slice))]
 <a href=#8 id=8 data-nosnippet>8</a>#![cfg_attr(not(test), warn(clippy::indexing_slicing))]
-<a href=#9 id=9 data-nosnippet>9</a>#![cfg_attr(not(test), warn(clippy::integer_arithmetic))]
+<a href=#9 id=9 data-nosnippet>9</a>#![cfg_attr(not(test), warn(clippy::arithmetic_side_effects))]
 <a href=#10 id=10 data-nosnippet>10</a>#![cfg_attr(not(test), warn(clippy::missing_panics_doc))]
 <a href=#11 id=11 data-nosnippet>11</a>#![cfg_attr(not(test), warn(clippy::panic))]
-<a href=#12 id=12 data-nosnippet>12</a>#![warn(clippy::unchecked_duration_subtraction)]
+<a href=#12 id=12 data-nosnippet>12</a>#![warn(clippy::unchecked_time_subtraction)]
 <a href=#13 id=13 data-nosnippet>13</a>#![cfg_attr(not(test), warn(clippy::unreachable))]
 <a href=#14 id=14 data-nosnippet>14</a>#![cfg_attr(not(test), warn(clippy::unwrap_used))]
 <a href=#15 id=15 data-nosnippet>15</a>
 <a href=#16 id=16 data-nosnippet>16</a></span><span class="kw">use </span>serde::{de::DeserializeOwned, Serialize};
 <a href=#17 id=17 data-nosnippet>17</a><span class="kw">use </span>std::fs::File;
 <a href=#18 id=18 data-nosnippet>18</a><span class="attr">#[doc(no_inline)]
-<a href=#19 id=19 data-nosnippet>19</a></span><span class="kw">pub use </span>std::path::Path;
+<a href=#19 id=19 data-nosnippet>19</a></span><span class="kw">pub use </span>std::path::PathBuf;
 <a href=#20 id=20 data-nosnippet>20</a>
 <a href=#21 id=21 data-nosnippet>21</a><span class="doccomment">/// Note: Methods that take a `&amp;mut self` and return a [`Result`] might cause de-sync between the internal data and the file if the [`Result`] is an [`Err`]
 <a href=#22 id=22 data-nosnippet>22</a></span><span class="attr">#[derive(Debug)]
@@ -31,9 +31,9 @@
 <a href=#31 id=31 data-nosnippet>31</a>}
 <a href=#32 id=32 data-nosnippet>32</a>
 <a href=#33 id=33 data-nosnippet>33</a><span class="attr">#[derive(thiserror::Error, Debug)]
-<a href=#34 id=34 data-nosnippet>34</a></span><span class="kw">pub enum </span>FileSyncError&lt;<span class="lifetime">'a</span>&gt; {
+<a href=#34 id=34 data-nosnippet>34</a></span><span class="kw">pub enum </span>FileSyncError {
 <a href=#35 id=35 data-nosnippet>35</a>    <span class="attr">#[error(<span class="string">"File \"{fp}\" already exists"</span>)]
-<a href=#36 id=36 data-nosnippet>36</a>    </span>FileAlreadyExists { fp: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Path },
+<a href=#36 id=36 data-nosnippet>36</a>    </span>FileAlreadyExists { fp: PathBuf },
 <a href=#37 id=37 data-nosnippet>37</a>    <span class="attr">#[error(<span class="string">"IO error"</span>)]
 <a href=#38 id=38 data-nosnippet>38</a>    </span>IoError(<span class="attr">#[from] </span>std::io::Error),
 <a href=#39 id=39 data-nosnippet>39</a>    <span class="attr">#[error(<span class="string">"serde_json error"</span>)]
@@ -65,7 +65,7 @@
 <a href=#65 id=65 data-nosnippet>65</a>    /// Will return an error if the creating the [`File`] returns an error
 <a href=#66 id=66 data-nosnippet>66</a>    ///
 <a href=#67 id=67 data-nosnippet>67</a>    /// Will return an error if [`serde_json::to_writer`]/[`serde_json::to_writer_pretty`] returns an error
-<a href=#68 id=68 data-nosnippet>68</a>    </span><span class="kw">pub fn </span>new(fp: <span class="kw-2">&amp;</span>Path, data: T, pretty: bool) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, FileSyncError&gt; {
+<a href=#68 id=68 data-nosnippet>68</a>    </span><span class="kw">pub fn </span>new(fp: PathBuf, data: T, pretty: bool) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, FileSyncError&gt; {
 <a href=#69 id=69 data-nosnippet>69</a>        <span class="kw">if </span>fp.exists() {
 <a href=#70 id=70 data-nosnippet>70</a>            <span class="prelude-val">Err</span>(FileSyncError::FileAlreadyExists { fp })
 <a href=#71 id=71 data-nosnippet>71</a>        } <span class="kw">else </span>{
@@ -89,7 +89,7 @@
 <a href=#89 id=89 data-nosnippet>89</a>    /// Will return an error if the creating the [`File`] returns an error
 <a href=#90 id=90 data-nosnippet>90</a>    ///
 <a href=#91 id=91 data-nosnippet>91</a>    /// Will return an error if [`serde_json::from_reader`] returns an error
-<a href=#92 id=92 data-nosnippet>92</a>    </span><span class="kw">pub fn </span>load(fp: <span class="kw-2">&amp;</span>Path, pretty: bool) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, FileSyncError&gt; {
+<a href=#92 id=92 data-nosnippet>92</a>    </span><span class="kw">pub fn </span>load(fp: PathBuf, pretty: bool) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, FileSyncError&gt; {
 <a href=#93 id=93 data-nosnippet>93</a>        <span class="kw">let </span>file = File::options().read(<span class="bool-val">true</span>).write(<span class="bool-val">true</span>).open(fp)<span class="question-mark">?</span>;
 <a href=#94 id=94 data-nosnippet>94</a>        <span class="kw">let </span>data = serde_json::from_reader(<span class="kw-2">&amp;</span>file)<span class="question-mark">?</span>;
 <a href=#95 id=95 data-nosnippet>95</a>        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ data, file, pretty })
@@ -106,7 +106,7 @@
 <a href=#106 id=106 data-nosnippet>106</a>    /// Will return an error if [`serde_json::to_writer`]/[`serde_json::to_writer_pretty`] returns an error
 <a href=#107 id=107 data-nosnippet>107</a>    ///
 <a href=#108 id=108 data-nosnippet>108</a>    /// Will return an error if [`serde_json::from_reader`] returns an error
-<a href=#109 id=109 data-nosnippet>109</a>    </span><span class="kw">pub fn </span>load_or_new(fp: <span class="kw-2">&amp;</span>Path, data: T, pretty: bool) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, FileSyncError&gt; {
+<a href=#109 id=109 data-nosnippet>109</a>    </span><span class="kw">pub fn </span>load_or_new(fp: PathBuf, data: T, pretty: bool) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, FileSyncError&gt; {
 <a href=#110 id=110 data-nosnippet>110</a>        <span class="kw">if </span>fp.exists() {
 <a href=#111 id=111 data-nosnippet>111</a>            FileSync::load(fp, pretty)
 <a href=#112 id=112 data-nosnippet>112</a>        } <span class="kw">else </span>{
@@ -194,4 +194,5 @@
 <a href=#194 id=194 data-nosnippet>194</a>    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
 <a href=#195 id=195 data-nosnippet>195</a>        <span class="self">self</span>.get()
 <a href=#196 id=196 data-nosnippet>196</a>    }
-<a href=#197 id=197 data-nosnippet>197</a>}</code></pre></div></section></main></body></html>
+<a href=#197 id=197 data-nosnippet>197</a>}
+</code></pre></div></section></main></body></html>

@@ -16,7 +16,7 @@
 use serde::{de::DeserializeOwned, Serialize};
 use std::fs::File;
 #[doc(no_inline)]
-pub use std::path::Path;
+pub use std::path::PathBuf;
 
 /// Note: Methods that take a `&mut self` and return a [`Result`] might cause de-sync between the internal data and the file if the [`Result`] is an [`Err`]
 #[derive(Debug)]
@@ -31,9 +31,9 @@ where
 }
 
 #[derive(thiserror::Error, Debug)]
-pub enum FileSyncError<'a> {
+pub enum FileSyncError {
     #[error("File \"{fp}\" already exists")]
-    FileAlreadyExists { fp: &'a Path },
+    FileAlreadyExists { fp: PathBuf },
     #[error("IO error")]
     IoError(#[from] std::io::Error),
     #[error("serde_json error")]
@@ -65,7 +65,7 @@ where
     /// Will return an error if the creating the [`File`] returns an error
     ///
     /// Will return an error if [`serde_json::to_writer`]/[`serde_json::to_writer_pretty`] returns an error
-    pub fn new(fp: &Path, data: T, pretty: bool) -> Result<Self, FileSyncError> {
+    pub fn new(fp: PathBuf, data: T, pretty: bool) -> Result<Self, FileSyncError> {
         if fp.exists() {
             Err(FileSyncError::FileAlreadyExists { fp })
         } else {
@@ -89,7 +89,7 @@ where
     /// Will return an error if the creating the [`File`] returns an error
     ///
     /// Will return an error if [`serde_json::from_reader`] returns an error
-    pub fn load(fp: &Path, pretty: bool) -> Result<Self, FileSyncError> {
+    pub fn load(fp: PathBuf, pretty: bool) -> Result<Self, FileSyncError> {
         let file = File::options().read(true).write(true).open(fp)?;
         let data = serde_json::from_reader(&file)?;
         Ok(Self { data, file, pretty })
@@ -106,7 +106,7 @@ where
     /// Will return an error if [`serde_json::to_writer`]/[`serde_json::to_writer_pretty`] returns an error
     ///
     /// Will return an error if [`serde_json::from_reader`] returns an error
-    pub fn load_or_new(fp: &Path, data: T, pretty: bool) -> Result<Self, FileSyncError> {
+    pub fn load_or_new(fp: PathBuf, data: T, pretty: bool) -> Result<Self, FileSyncError> {
         if fp.exists() {
             FileSync::load(fp, pretty)
         } else {
