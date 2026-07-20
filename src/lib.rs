@@ -6,10 +6,10 @@
 #![warn(clippy::fallible_impl_from)]
 #![cfg_attr(not(test), warn(clippy::index_refutable_slice))]
 #![cfg_attr(not(test), warn(clippy::indexing_slicing))]
-#![cfg_attr(not(test), warn(clippy::integer_arithmetic))]
+#![cfg_attr(not(test), warn(clippy::arithmetic_side_effects))]
 #![cfg_attr(not(test), warn(clippy::missing_panics_doc))]
 #![cfg_attr(not(test), warn(clippy::panic))]
-#![warn(clippy::unchecked_duration_subtraction)]
+#![warn(clippy::unchecked_time_subtraction)]
 #![cfg_attr(not(test), warn(clippy::unreachable))]
 #![cfg_attr(not(test), warn(clippy::unwrap_used))]
 
